@@ -354,6 +354,8 @@
                 neuX--;
             } else if (ereignis.key === 'ArrowRight' || ereignis.key === 'd' || ereignis.key === 'D') {
                 neuX++;
+            } else if (ereignis.key === 'r' || ereignis.key === 'R') {
+                location.reload();
             } else if (ereignis.key === ' '|| ereignis.key === 'Enter') {
                 if (karte[spieler.y][spieler.x] !== TYPEN.BOMBE) {  //!bombeAktiv && 
                     bombeAktiv = true;
