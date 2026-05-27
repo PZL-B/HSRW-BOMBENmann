@@ -427,7 +427,11 @@
 
         karteInitialisieren();
         let rndm = Math.random();
-        if(rndm>.8)
+        if(rndm>.93)
+        {gegnerErzeugen(5);}
+        else if(rndm>.8)
+        {gegnerErzeugen(4);}
+        else if(rndm>.6)
         {gegnerErzeugen(3);}
         else if(rndm>.4)
         {gegnerErzeugen(2);}
