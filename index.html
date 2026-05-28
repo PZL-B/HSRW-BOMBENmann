@@ -108,7 +108,7 @@
         }
 
         .gegner {
-            font-size: 24px;
+            font-size: 38px;
             position: absolute;
         }
     </style>
@@ -229,7 +229,7 @@
                     for (let gegner of gegnerListe) {
                         if (x === gegner.x && y === gegner.y) {
                             const gegnerSpan = document.createElement('span');
-                            gegnerSpan.innerHTML = '🔴';
+                            gegnerSpan.innerHTML = '🎈';
                             gegnerSpan.classList.add('gegner');
                             feldElement.appendChild(gegnerSpan);
                         }
@@ -357,7 +357,7 @@
             } else if (ereignis.key === 'r' || ereignis.key === 'R') {
                 location.reload();
             } else if (ereignis.key === ' '|| ereignis.key === 'Enter') {
-                if (karte[spieler.y][spieler.x] !== TYPEN.BOMBE) {  //!bombeAktiv && 
+                if (karte[spieler.y][spieler.x] !== TYPEN.BOMBE) {   
                     bombeAktiv = true;
                     let bombenX = spieler.x;
                     let bombenY = spieler.y;
@@ -439,7 +439,7 @@
         {gegnerErzeugen(1);}
         karteZeichnen();
         
-        setInterval(gegnerBewegen, 800);
+        setInterval(gegnerBewegen, 450);
     </script>
 </body>
 </html>
