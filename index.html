@@ -307,7 +307,7 @@
                     let ny = gegner.y + richtung.dy;
                     
                     if (nx >= 0 && nx < SPALTEN && ny >= 0 && ny < ZEILEN) {
-                        if (karte[ny][nx] === TYPEN.LEER || karte[ny][nx] === TYPEN.EXPLOSION) {
+                        if (karte[ny][nx] === TYPEN.LEER) {
                             gueltigeZuege.push({x: nx, y: ny});
                         }
                     }
