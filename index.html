@@ -86,29 +86,33 @@
         .block {
             background-color: #dadada;
             border: 2px solid #6b6b6b;
+            font-size: 38px;
+            position: relative;
+
         }
 
         .leer {
             
         }
 
-        .spieler {
+        .spiler {
             color: black;
-            font-size: 24px;
+            font-size: 26px;
             position: absolute;
         }
 
         .bombe {
             color: black;
-            font-size: 24px;
+            font-size: 30px;
         }
 
         .explosion {
             background-color: #a00404;
+            font-size: 30px;
         }
 
         .gegner {
-            font-size: 38px;
+            font-size: 40px;
             position: absolute;
         }
     </style>
@@ -139,9 +143,9 @@
         let karte = [];
         let bombeAktiv = false;
         let leben = 3;
-        let spielBeendet = false;
+        let spielBendet = false;
 
-        let spieler = {
+        let spiler = {
             x: 1,
             y: 1
         };
@@ -208,9 +212,10 @@
                         feldElement.classList.add('wand');
                     } else if (karte[y][x] === TYPEN.BLOCK) {
                         feldElement.classList.add('block');
+                        feldElement.innerHTML = '🧱';
                     } else if (karte[y][x] === TYPEN.BOMBE) {
                         feldElement.classList.add('leer');
-                        feldElement.innerHTML = '⚫';
+                        feldElement.innerHTML = '💣';
                         feldElement.classList.add('bombe');
                     } else if (karte[y][x] === TYPEN.EXPLOSION) {
                         feldElement.classList.add('explosion');
@@ -219,11 +224,11 @@
                         feldElement.classList.add('leer');
                     }
 
-                    if (x === spieler.x && y === spieler.y) {
-                        const spielerSpan = document.createElement('span');
-                        spielerSpan.innerHTML = '▲'; 
-                        spielerSpan.classList.add('spieler');
-                        feldElement.appendChild(spielerSpan);
+                    if (x === spiler.x && y === spiler.y) {
+                        const spilerSpan = document.createElement('span');
+                        spilerSpan.innerHTML = '🤖'; 
+                        spilerSpan.classList.add('spiler');
+                        feldElement.appendChild(spilerSpan);
                     }
 
                     for (let gegner of gegnerListe) {
@@ -241,16 +246,16 @@
         }
 
         function spielerSchadenPruefen() {
-            if (spielBeendet) return;
+            if (spielBendet) return;
             
             let getroffen = false;
             
-            if (karte[spieler.y][spieler.x] === TYPEN.EXPLOSION) {
+            if (karte[spiler.y][spiler.x] === TYPEN.EXPLOSION) {
                 getroffen = true;
             }
             
             for (let gegner of gegnerListe) {
-                if (gegner.x === spieler.x && gegner.y === spieler.y) {
+                if (gegner.x === spiler.x && gegner.y === spiler.y) {
                     getroffen = true;
                 }
             }
@@ -260,17 +265,17 @@
                 lebenAnzeige.innerText = 'Leben: ' + leben;
                 
                 if (leben <= 0) {
-                    spielBeendet = true;
+                    spielBendet = true;
                     spielendeOverlay.style.display = 'flex';
                 } else {
-                    spieler.x = 1;
-                    spieler.y = 1;
+                    spiler.x = 1;
+                    spiler.y = 1;
                 }
             }
         }
 
         function gegnerSchadenPruefen() {
-            if (spielBeendet) return;
+            if (spielBendet) return;
 
             let ueberlebendeGegner = [];
             
@@ -284,13 +289,13 @@
             gegnerAnzeige.innerText = 'Gegner: ' + gegnerListe.length;
 
             if (gegnerListe.length === 0) {
-                spielBeendet = true;
+                spielBendet = true;
                 gewinnOverlay.style.display = 'flex';
             }
         }
 
         function gegnerBewegen() {
-            if (spielBeendet) return;
+            if (spielBendet) return;
             
             for (let gegner of gegnerListe) {
                 const richtungen = [
@@ -325,13 +330,13 @@
         }
 
         document.addEventListener('keydown', function(ereignis) {
-            if (spielBeendet) return;
+            if (spielBendet) return;
 
-            let aktuelleTaste = ereignis.key;
-            if (aktuelleTaste === 'B') aktuelleTaste = 'b';
-            if (aktuelleTaste === 'A') aktuelleTaste = 'a';
+            let aktueleTaste = ereignis.key;
+            if (aktueleTaste === 'B') aktueleTaste = 'b';
+            if (aktueleTaste === 'A') aktueleTaste = 'a';
 
-            eingabeSequenz.push(aktuelleTaste);
+            eingabeSequenz.push(aktueleTaste);
 
             if (eingabeSequenz.length > konamiCode.length) {
                 eingabeSequenz.shift(); 
@@ -343,24 +348,34 @@
                 eingabeSequenz = []; 
             }
             
-            let neuX = spieler.x;
-            let neuY = spieler.y;
+            let neuX = spiler.x;
+            let neuY = spiler.y;
 
             if (ereignis.key === 'ArrowUp' || ereignis.key === 'w' || ereignis.key === 'W') {
                 neuY--;
-            } else if (ereignis.key === 'ArrowDown' || ereignis.key === 's' || ereignis.key === 'S') {
+            }
+            else if (ereignis.key === 'ArrowDown' || ereignis.key === 's' || ereignis.key === 'S') 
+            {
                 neuY++;
-            } else if (ereignis.key === 'ArrowLeft' || ereignis.key === 'a' || ereignis.key === 'A') {
+            }
+            else if (ereignis.key === 'ArrowLeft' || ereignis.key === 'a' || ereignis.key === 'A') 
+            {
                 neuX--;
-            } else if (ereignis.key === 'ArrowRight' || ereignis.key === 'd' || ereignis.key === 'D') {
+            }
+            else if (ereignis.key === 'ArrowRight' || ereignis.key === 'd' || ereignis.key === 'D') 
+            {
                 neuX++;
-            } else if (ereignis.key === 'r' || ereignis.key === 'R') {
+            }
+            else if (ereignis.key === 'r' || ereignis.key === 'R') 
+            {
                 location.reload();
-            } else if (ereignis.key === ' '|| ereignis.key === 'Enter') {
-                if (karte[spieler.y][spieler.x] !== TYPEN.BOMBE) {   
+            }
+            else if (ereignis.key === ' '|| ereignis.key === 'Enter') 
+            {
+                if (karte[spiler.y][spiler.x] !== TYPEN.BOMBE) {   
                     bombeAktiv = true;
-                    let bombenX = spieler.x;
-                    let bombenY = spieler.y;
+                    let bombenX = spiler.x;
+                    let bombenY = spiler.y;
                     karte[bombenY][bombenX] = TYPEN.BOMBE;
                     karteZeichnen();
 
@@ -416,8 +431,8 @@
             
             if (neuX >= 0 && neuX < SPALTEN && neuY >= 0 && neuY < ZEILEN) {
                 if (karte[neuY][neuX] === TYPEN.LEER || karte[neuY][neuX] === TYPEN.EXPLOSION) {
-                    spieler.x = neuX;
-                    spieler.y = neuY;
+                    spiler.x = neuX;
+                    spiler.y = neuY;
                     spielerSchadenPruefen();
                 }
             }
