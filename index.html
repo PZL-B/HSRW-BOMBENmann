@@ -72,6 +72,7 @@
         .feld {
             width: 40px;
             height: 40px;
+            color: #0d4a00;
             box-sizing: border-box;
             display: flex;
             justify-content: center;
@@ -79,20 +80,23 @@
         }
         
         .wand {
-            background-color: #b0b6af;
-            border: 2px solid #434640;
+            background-color: #9b9999;
+            font-size: 38px;
+            color: #4b4c4b;
+            border: 2px solid #2a2b29;
+            line-height: 1;
         }
 
         .block {
-            background-color: #dadada;
-            border: 2px solid #6b6b6b;
+            background-color: #f5733f;
             font-size: 38px;
             position: relative;
 
         }
 
         .leer {
-            
+            font-size: 40px;
+            color: #0d4a00;
         }
 
         .spiler {
@@ -111,7 +115,12 @@
             font-size: 30px;
         }
 
-        .gegner {
+        .gegner1 {
+            font-size: 40px;
+            position: absolute;
+        }
+
+        .gegner2 {
             font-size: 40px;
             position: absolute;
         }
@@ -141,6 +150,7 @@
         const gewinnOverlay = document.getElementById('gewinn-overlay');
         
         let karte = [];
+        let wandWinkel = [];
         let bombeAktiv = false;
         let leben = 3;
         let spielBendet = false;
@@ -166,14 +176,17 @@
         function karteInitialisieren() {
             for (let y = 0; y < ZEILEN; y++) {
                 let reihe = [];
+                let winkelReihe = []; 
                 for (let x = 0; x < SPALTEN; x++) {
+                    
+                    winkelReihe.push(Math.floor(Math.random() * 360) + 1);
+
                     if (y === 0 || y === ZEILEN - 1 || x === 0 || x === SPALTEN - 1) {
                         reihe.push(TYPEN.WAND);
                     } 
                     else if (y % 2 === 0 && x % 2 === 0) {
                         reihe.push(TYPEN.WAND);
                     } 
-
                     else if ((x === 1 && y === 1) || (x === 1 && y === 2) || (x === 2 && y === 1)) {
                         reihe.push(TYPEN.LEER);
                     } 
@@ -182,6 +195,7 @@
                     }
                 }
                 karte.push(reihe);
+                wandWinkel.push(winkelReihe);
             }
         }
 
@@ -191,8 +205,9 @@
                 while (!platziert) {
                     let gx = Math.floor(Math.random() * 9) + 9;
                     let gy = Math.floor(Math.random() * 6) + 6;
-                    if (karte[gy][gx] === TYPEN.LEER) {
-                        gegnerListe.push({x: gx, y: gy});
+                    if (karte[gy][gx] === TYPEN.LEER && !gegnerListe.some(g => g.x === gx && g.y === gy)) {
+                        let zufallsTyp = Math.random() < 0.5 ? 1 : 2;
+                        gegnerListe.push({x: gx, y: gy, typ: zufallsTyp});
                         platziert = true;
                     }
                 }
@@ -210,6 +225,11 @@
                     
                     if (karte[y][x] === TYPEN.WAND) {
                         feldElement.classList.add('wand');
+                        const winkel = wandWinkel[y][x];
+                        feldElement.innerHTML = `<span style="display: inline-block; transform: rotate(${winkel}deg);">🪨</span>`;
+                    } else if (karte[y][x] === TYPEN.LEER) {
+                    } else if (karte[y][x] === TYPEN.LEER) {
+                        feldElement.innerHTML = '෴' ;
                     } else if (karte[y][x] === TYPEN.BLOCK) {
                         feldElement.classList.add('block');
                         feldElement.innerHTML = '🧱';
@@ -231,11 +251,17 @@
                         feldElement.appendChild(spilerSpan);
                     }
 
+
                     for (let gegner of gegnerListe) {
                         if (x === gegner.x && y === gegner.y) {
                             const gegnerSpan = document.createElement('span');
-                            gegnerSpan.innerHTML = '🎈';
-                            gegnerSpan.classList.add('gegner');
+                            if (gegner.typ === 1) {
+                                gegnerSpan.innerHTML = '🎈';
+                                gegnerSpan.classList.add('gegner1');
+                            } else {
+                                gegnerSpan.innerHTML = '👾';
+                                gegnerSpan.classList.add('gegner2');
+                            }
                             feldElement.appendChild(gegnerSpan);
                         }
                     }
@@ -252,10 +278,11 @@
             
             if (karte[spiler.y][spiler.x] === TYPEN.EXPLOSION) {
                 getroffen = true;
+                
             }
             
-            for (let gegner of gegnerListe) {
-                if (gegner.x === spiler.x && gegner.y === spiler.y) {
+            for (let gegner1 of gegnerListe) {
+                if (gegner1.x === spiler.x && gegner1.y === spiler.y) {
                     getroffen = true;
                 }
             }
@@ -279,9 +306,9 @@
 
             let ueberlebendeGegner = [];
             
-            for (let gegner of gegnerListe) {
-                if (karte[gegner.y][gegner.x] !== TYPEN.EXPLOSION) {
-                    ueberlebendeGegner.push(gegner);
+            for (let gegner1 of gegnerListe) {
+                if (karte[gegner1.y][gegner1.x] !== TYPEN.EXPLOSION) {
+                    ueberlebendeGegner.push(gegner1);
                 }
             }
 
@@ -297,7 +324,7 @@
         function gegnerBewegen() {
             if (spielBendet) return;
             
-            for (let gegner of gegnerListe) {
+            for (let gegner1 of gegnerListe) {
                 const richtungen = [
                     {dx: 0, dy: -1},
                     {dx: 0, dy: 1},
@@ -308,11 +335,11 @@
                 let gueltigeZuege = [];
                 
                 for (let richtung of richtungen) {
-                    let nx = gegner.x + richtung.dx;
-                    let ny = gegner.y + richtung.dy;
+                    let nx = gegner1.x + richtung.dx;
+                    let ny = gegner1.y + richtung.dy;
                     
                     if (nx >= 0 && nx < SPALTEN && ny >= 0 && ny < ZEILEN) {
-                        if (karte[ny][nx] === TYPEN.LEER) {
+                        if (karte[ny][nx] === TYPEN.LEER && !gegnerListe.some(g => g.x === nx && g.y === ny)) {
                             gueltigeZuege.push({x: nx, y: ny});
                         }
                     }
@@ -320,8 +347,8 @@
                 
                 if (gueltigeZuege.length > 0) {
                     let zug = gueltigeZuege[Math.floor(Math.random() * gueltigeZuege.length)];
-                    gegner.x = zug.x;
-                    gegner.y = zug.y;
+                    gegner1.x = zug.x;
+                    gegner1.y = zug.y;
                 }
             }
             gegnerSchadenPruefen();
